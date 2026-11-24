@@ -122,6 +122,14 @@ form input:focus,form textarea:focus,form select:focus{outline:2px solid var(--y
 .empty{text-align:center;color:var(--muted);padding:30px 0}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#fff;color:#111;padding:10px 18px;border-radius:99px;font-weight:600;font-size:14px;opacity:0;transition:.25s;z-index:80;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+#callOv{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:90;display:none}
+#callSheet{position:fixed;left:0;right:0;bottom:0;z-index:100;max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:22px 22px 0 0;padding:20px;display:none}
+#callOv.show,#callSheet.show{display:block}
+#callSheet h3{font-size:28px;margin-bottom:12px}
+#callSheet a.num{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:10px;font-weight:700;font-size:20px}
+#callSheet a.num span{color:var(--yellow)}
+#callSheet button.cancel{width:100%;background:transparent;color:var(--muted);padding:12px;font-size:15px}
 </style>
 </head>
 <body>
@@ -141,7 +149,7 @@ form input:focus,form textarea:focus,form select:focus{outline:2px solid var(--y
     <p>Burgers, sandwichs, tacos, poutines et crispy box. Du goût, du vrai, livré chez vous à Tizi Ouzou.</p>
     <div class="cta">
       <a class="btn primary" href="#menu">Voir le menu</a>
-      <a class="btn ghost" id="heroCall" href="tel:0770012515">📞 Appeler</a>
+      <a class="btn ghost js-call" id="heroCall" href="tel:0770012515">📞 Appeler</a>
     </div>
     <div class="badges"><span>🔥 Produits frais</span><span>🛵 Livraison disponible</span><span>📍 Tizi Ouzou</span></div>
   </div>
@@ -201,9 +209,16 @@ form input:focus,form textarea:focus,form select:focus{outline:2px solid var(--y
   </div>
   <div class="dfoot">
     <button class="btn wa" id="sendWa">Envoyer ma commande sur WhatsApp</button>
-    <a class="btn call" href="tel:0770012515">📞 Ou commander par téléphone</a>
+    <a class="btn call js-call" href="tel:0770012515">📞 Ou commander par téléphone</a>
   </div>
 </aside>
+<div id="callOv"></div>
+<div id="callSheet" role="dialog" aria-label="Choisir un numéro">
+  <h3>Appeler quel numéro ?</h3>
+  <a class="num" href="tel:0770012515">0770 01 25 15 <span>📞</span></a>
+  <a class="num" href="tel:0550101288">0550 10 12 88 <span>📞</span></a>
+  <button class="cancel" id="callCancel" type="button">Annuler</button>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -379,6 +394,16 @@ $("#sendWa").onclick = ()=>{
     $("#statusTxt").textContent = open ? "Ouvert · jusqu'à "+CONFIG.closeAt.replace(":","h") : "Fermé";
   }
   update(); setInterval(update, 60000);
+})();
+
+/* ============ Choix du numéro à appeler ============ */
+(function(){
+  const sheet=$("#callSheet"), ov=$("#callOv");
+  const show=()=>{sheet.classList.add("show");ov.classList.add("show")};
+  const hide=()=>{sheet.classList.remove("show");ov.classList.remove("show")};
+  document.querySelectorAll(".js-call").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();show();}));
+  ov.onclick=hide; $("#callCancel").onclick=hide;
+  sheet.querySelectorAll("a.num").forEach(a=>a.addEventListener("click",()=>setTimeout(hide,300)));
 })();
 $("#year").textContent = new Date().getFullYear();
 renderCart();
